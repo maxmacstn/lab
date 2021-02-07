@@ -1,8 +1,23 @@
 <html>
+
 <head>
-<title>Flask Tutorial</title>
+    <title>Flask Tutorial</title>
 </head>
+<script>
+fetch("https://127.0.0.1:5000/hello")
+  .then(function (response) {
+    return response.json();
+  })
+  .then(function (myJson) {
+    console.log(myJson.ip);
+  })
+  .catch(function (error) {
+    console.log("Error: " + error);
+  });
+</script>
+
 <body>
-<h1>This is the Index page</h1>
+    <h1>This is the Index page</h1>
 </body>
-</html>  
+
+</html>
