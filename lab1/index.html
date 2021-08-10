@@ -69,7 +69,7 @@
                         </div>
                     </div>
 
-                    <button onclick="upload('{{ request.url }}');" id="upload_btn"
+                    <button onclick="upload();" id="upload_btn"
                         class="btn btn-primary">Upload</button>
 
                     <button class="btn btn-primary d-none" id="loading_btn" type="button" disabled>
@@ -158,7 +158,7 @@
     }
 
     // Function to upload file
-    function upload(url) {
+    function upload() {
 
         // Reject if the file input is empty & throw alert
         if (!input.value) {
@@ -179,8 +179,7 @@
         // Create a XMLHTTPRequest instance
         var request = new XMLHttpRequest();
 
-        // Set the response type
-        request.responseType = "json";
+
 
         // Clear any existing alerts
         alert_wrapper.innerHTML = "";
@@ -213,15 +212,12 @@
         // Append the file to the FormData instance
         data.append("file", file);
 
-        const config = {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            },
-
-        }
         console.log("Start to upload")
         axiosInstance
-            .post('/upload', data, {
+            .put('/upload', data, {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
                 onUploadProgress: function (e) {
                     console.log(e)
                     var percentCompleted = Math.round((e.loaded * 100) / e.total)
@@ -242,7 +238,7 @@
             .then((response) => {
                 console.log(response.data);
                 result.innerHTML = JSON.stringify(response.data)
-                show_alert(`${request.response.message}`, "success");
+                //show_alert(`${request.response.message}`, "success");
             })
             .catch((error) => {
                 console.log(error);
