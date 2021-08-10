@@ -6,26 +6,51 @@
 </head>
 
 <style>
-#container {
-	margin: 0px auto;
-	width: 500px;
-	height: 375px;
-	border: 10px #333 solid;
-}
-#videoElement {
-	width: 500px;
-	height: 375px;
-	background-color: #666;
-}
+    #container {
+        margin: 0px auto;
+        width: 500px;
+        height: 375px;
+        border: 10px #333 solid;
+    }
+
+    #videoElement {
+        width: 500px;
+        height: 375px;
+        background-color: #666;
+    }
 </style>
+
 <body>
     <h1>This is the Index page 333</h1>
     <output id="result"></output>
     <div id="container">
-	<video autoplay="true" id="videoElement">
-	
-	</video>
-</div>
+        <video autoplay="true" id="videoElement">
+
+        </video>
+    </div>
+
+    <p>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+    <ul class=flashes>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    </p>
+    <form method="post" action="/" enctype="multipart/form-data">
+        <dl>
+            <p>
+                <input type="file" name="file" autocomplete="off" required>
+            </p>
+        </dl>
+        <p>
+            <input type="submit" value="Submit">
+        </p>
+    </form>
+
 </body>
 
 <script>
@@ -44,22 +69,19 @@
         .catch((error) => {
             console.log(error);
         });
-	
-	
-	var video = document.querySelector("#videoElement");
 
-if (navigator.mediaDevices.getUserMedia) {
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then(function (stream) {
-      video.srcObject = stream;
-    })
-    .catch(function (err0r) {
-      console.log("Something went wrong!");
-    });
-}
+
+    var video = document.querySelector("#videoElement");
+
+    if (navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                video.srcObject = stream;
+            })
+            .catch(function (err0r) {
+                console.log("Something went wrong!");
+            });
+    }
 </script>
 
 </html>
-
-
-
