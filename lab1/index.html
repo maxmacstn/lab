@@ -37,7 +37,7 @@
 
         </video>
     </div>
-
+     <button onclick="split()">Split</button> 
     <form method="POST" action='/upload' class="dropzone dz-clickable" id="dropper" enctype="multipart/form-data">
     </form>
 
@@ -76,7 +76,18 @@
     var baseURL = `${location.protocol}//${location.hostname}`
 
 
+    function split() {
+          axiosInstance
+        .post("/split")
+        .then((response) => {
+            console.log(response.data);
+            result.innerHTML = JSON.stringify(response.data)
+        })
+        .catch((error) => {
+            console.log(error);
+        });
 
+       }
 
     Dropzone.options.dropper = {
         paramName: 'file',
