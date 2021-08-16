@@ -100,6 +100,45 @@
        }
 
 
+    function trainObj() {
+          axiosInstance
+        .post("/trainObject")
+        .then((response) => {
+            console.log(response.data);
+            result.innerHTML = JSON.stringify(response.data)
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+
+       }
+
+
+    function exportObj() {
+          axiosInstance
+        .post("/exportModelObject")
+        .then((response) => {
+            console.log(response.data);
+            result.innerHTML = JSON.stringify(response.data)
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+
+       }
+
+    function getResults() {
+          axiosInstance
+        .post("/getResult")
+        .then((response) => {
+            console.log(response.data);
+            result.innerHTML = JSON.stringify(response.data)
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+
+       }
 
   
 
