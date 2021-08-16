@@ -38,6 +38,9 @@
         </video>
     </div>
      <button onclick="split()">Split</button> 
+     <button onclick="trainObj()">Train</button> 
+     <button onclick="exportObj()">Export</button> 
+     <button onclick="getResults()">Results</button> 
     <form method="POST" action='/upload' class="dropzone dz-clickable" id="dropper" enctype="multipart/form-data">
     </form>
 
@@ -89,14 +92,49 @@
 
        }
 
-    Dropzone.options.dropper = {
-        paramName: 'file',
-        chunking: true,
-        forceChunking: true,
-        url: baseURL + '/upload',
-        maxFilesize: 1025, // megabytes
-        chunkSize: 1000000 // bytes
-    }
+
+
+  function trainObj() {
+          axiosInstance
+        .post("/trainObject")
+        .then((response) => {
+            console.log(response.data);
+            result.innerHTML = JSON.stringify(response.data)
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+
+       }
+
+  function exportObj() {
+          axiosInstance
+        .post("/exportModelObject")
+        .then((response) => {
+            console.log(response.data);
+            result.innerHTML = JSON.stringify(response.data)
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+
+       }       
+
+
+  function getResults() {
+          axiosInstance
+        .post("/getResult")
+        .then((response) => {
+            console.log(response.data);
+            result.innerHTML = JSON.stringify(response.data)
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+
+       }
+
+
 
 </script>
 
