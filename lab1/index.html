@@ -1,14 +1,10 @@
 <html>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
-    integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
-
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/min/dropzone.min.css" />
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/min/basic.min.css" />
-
-<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/min/dropzone.min.js">
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.8.0/dist/tf.min.js"></script>
+<script type="application/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/min/dropzone.min.js"></script>
 
 <head>
     <title>Lab 1</title>
@@ -41,6 +37,7 @@
     <button onclick="trainObj()">Train</button>
     <button onclick="exportObj()">Export</button>
     <button onclick="getResults()">Results</button>
+    <button onclick="loadModel()">Load model</button>
     <form action='/upload' class="dropzone dz-clickable" id="dropper" enctype="multipart/form-data">
     </form>
 
@@ -86,6 +83,15 @@
         chunkSize: 3000000 // bytes
     }
 
+
+async function loadModel() {
+  // It's possible to load the model locally or from a repo
+  // You can choose whatever IP and PORT you want in the "http://127.0.0.1:8080/model.json" just set it before in your https server
+  const model = await tf.loadGraphModel("getFiles/model.json");
+  console.log("loaded model");
+  //const model = await loadGraphModel("https://raw.githubusercontent.com/hugozanini/TFJS-object-detection/master/models/kangaroo-detector/model.json");
+  return model;
+}
     function split() {
         axiosInstance
             .post("/split")
