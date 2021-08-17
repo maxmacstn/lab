@@ -37,10 +37,10 @@
 
 
     <section id="demos">
-    <div id="liveView" >
-    <button id="webcamButton" class="invisible">Loading...</button>
-        <video id="webcam" class="background" playsinline crossorigin="anonymous"></video>
-    </div>
+        <div id="liveView">
+            <button id="webcamButton" class="invisible">Loading...</button>
+            <video id="webcam" class="background" playsinline crossorigin="anonymous"></video>
+        </div>
     </section>
 
     <button onclick="split()">Split</button>
@@ -54,16 +54,16 @@
 </body>
 
 <script>
-  const video = document.getElementById('webcam');
-  const liveView = document.getElementById('liveView');
-const demosSection = document.getElementById('demos');
-const enableWebcamButton = document.getElementById('webcamButton');
-const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
-const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
-var vidWidth = 0;
-var vidHeight = 0;
-var xStart = 0;
-var yStart = 0;
+    const video = document.getElementById('webcam');
+    const liveView = document.getElementById('liveView');
+    const demosSection = document.getElementById('demos');
+    const enableWebcamButton = document.getElementById('webcamButton');
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0)
+    const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0)
+    var vidWidth = 0;
+    var vidHeight = 0;
+    var xStart = 0;
+    var yStart = 0;
     var axiosInstance = axios.create({
         baseURL: `${location.protocol}//${location.hostname}`,
     });
@@ -104,162 +104,162 @@ var yStart = 0;
     }
 
 
-async function loadModel() {
-  // It's possible to load the model locally or from a repo
-  // You can choose whatever IP and PORT you want in the "http://127.0.0.1:8080/model.json" just set it before in your https server
-  const lmodel = await tf.loadGraphModel("getFiles/model.json");
-  console.log("loaded model");
-  //const model = await loadGraphModel("https://raw.githubusercontent.com/hugozanini/TFJS-object-detection/master/models/kangaroo-detector/model.json");
-  return lmodel;
-}
-
-let model;
-
-function startDetection() {
-    loadModel().then(lmodel => {
-      console.log(lmodel)
-      model = lmodel
-      console.log("loaded model!!!!!");
-          navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: "environment"
-      },
-    }).then(stream => {
-      let $video = document.querySelector('video');
-      $video.srcObject = stream;
-      $video.onloadedmetadata = () => {
-        vidWidth = $video.videoHeight;
-        vidHeight = $video.videoWidth;
-        //The start position of the video (from top left corner of the viewport)
-        xStart = Math.floor((vw - vidWidth) / 2);
-        yStart = (Math.floor((vh - vidHeight) / 2) >= 0) ? (Math.floor((vh - vidHeight) / 2)) : 0;
-        $video.play();
-        //Attach detection model to loaded data event:
-        console.log(model)
-        $video.addEventListener('loadeddata', predictWebcamTF);
-      }
-    });
-    })
-
-  var children = [];
-    //Perform prediction based on webcam using Layer model model:
-    function predictWebcamTF() {
-      // Now let's start classifying a frame in the stream.
-      detectTFMOBILE(video).then(function () {
-        // Call this function again to keep predicting when the browser is ready.
-        window.requestAnimationFrame(predictWebcamTF);
-      });
+    async function loadModel() {
+        // It's possible to load the model locally or from a repo
+        // You can choose whatever IP and PORT you want in the "http://127.0.0.1:8080/model.json" just set it before in your https server
+        const lmodel = await tf.loadGraphModel("getFiles/model.json");
+        console.log("loaded model");
+        //const model = await loadGraphModel("https://raw.githubusercontent.com/hugozanini/TFJS-object-detection/master/models/kangaroo-detector/model.json");
+        return lmodel;
     }
-    const imageSize = 512;
-    //Match prob. threshold for object detection:
-    var classProbThreshold = 0.4; //40%
-    //Image detects object that matches the preset:
 
-   async function detectTFMOBILE(imgToPredict) {
-      //Get next video frame:
-      await tf.nextFrame();
-      //Create tensor from image:
-      const tfImg = tf.browser.fromPixels(imgToPredict);
+    let model;
 
-      //Create smaller image which fits the detection size
-      const smallImg = tf.image.resizeBilinear(tfImg, [vidHeight, vidWidth]);
+    function startDetection() {
+        loadModel().then(lmodel => {
+            console.log(lmodel)
+            model = lmodel
+            console.log("loaded model!!!!!");
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: "environment"
+                },
+            }).then(stream => {
+                let $video = document.querySelector('video');
+                $video.srcObject = stream;
+                $video.onloadedmetadata = () => {
+                    vidWidth = $video.videoHeight;
+                    vidHeight = $video.videoWidth;
+                    //The start position of the video (from top left corner of the viewport)
+                    xStart = Math.floor((vw - vidWidth) / 2);
+                    yStart = (Math.floor((vh - vidHeight) / 2) >= 0) ? (Math.floor((vh - vidHeight) / 2)) : 0;
+                    $video.play();
+                    //Attach detection model to loaded data event:
+                    console.log(model)
+                    $video.addEventListener('loadeddata', predictWebcamTF);
+                }
+            });
+        })
 
-      const resized = tf.cast(smallImg, "int32");
-      var tf4d_ = tf.tensor4d(Array.from(resized.dataSync()), [
-        1,
-        vidHeight,
-        vidWidth,
-        3,
-      ]);
-      const tf4d = tf.cast(tf4d_, "int32");
-
-      //Perform the detection with your layer model:
-      let res2 = await model.executeAsync(tf4d);
-      //const count = res2[3].dataSync()[0];
-      //const boxes = res2[7].dataSync();
-      //const scores = res2[2].dataSync();
-      //const classes = res2[3].dataSync();
-      
-      const scores = res2[3].dataSync();
-    //console.log(scores[0])
-      const count = res2[2].dataSync()[0];
-      const classes = res2[6].dataSync();
-      const boxes = res2[3].dataSync();
-      //console.log(res2);
-      //console.log(boxes);
-      //console.log("Count == ")
-      //console.log(count);
-      //console.log(scores);
-      //console.log(classes);
-      //console.log(classes);
-
-      //console.log(predictions[4].dataSync())
-
-      //Draw box around the detected object:
-      renderPredictionBoxes(boxes, classes, scores, count);
-      //Dispose of the tensors (so it won't consume memory)
-      tfImg.dispose();
-      smallImg.dispose();
-      resized.dispose();
-      tf4d.dispose();
-    }
-    //Function Renders boxes around the detections:
-    function renderPredictionBoxes(
-      predictionBoxes,
-      predictionClasses,
-      predictionScores,
-      count
-    ) {
-      //Remove all detections:
-      for (let i = 0; i < children.length; i++) {
-        liveView.removeChild(children[i]);
-      }
-      children.splice(0);
-      //Loop through predictions and draw them to the live view if they have a high confidence score.
-      for (let i = 0; i < count; i++) {
-        //If we are over 66% sure we are sure we classified it right, draw it!
-        const minY = (predictionBoxes[i * 4] * vidHeight + yStart).toFixed(0);
-        const minX = (predictionBoxes[i * 4 + 1] * vidWidth + xStart).toFixed(
-          0
-        );
-        const maxY = (predictionBoxes[i * 4 + 2] * vidHeight + yStart).toFixed(
-          0
-        );
-        const maxX = (predictionBoxes[i * 4 + 3] * vidWidth + xStart).toFixed(
-          0
-        );
-        const score = predictionScores[i] * 100;
-        const width_ = (maxX - minX).toFixed(0);
-        const height_ = (maxY - minY).toFixed(0);
-        //If confidence is above 70%
-        if (score > 30 && score < 100) {
-          console.log(score);
-          console.log(predictionClasses[i]);
-          const highlighter = document.createElement("div");
-          highlighter.setAttribute("class", "highlighter");
-          highlighter.style =
-            "left: " +
-            minX +
-            "px; " +
-            "top: " +
-            minY +
-            "px; " +
-            "width: " +
-            width_ +
-            "px; " +
-            "height: " +
-            height_ +
-            "px;";
-          highlighter.innerHTML =
-            "<p>" + Math.round(score) + "% " + "Your Object Name" + "</p>";
-          liveView.appendChild(highlighter);
-          children.push(highlighter);
+        var children = [];
+        //Perform prediction based on webcam using Layer model model:
+        function predictWebcamTF() {
+            // Now let's start classifying a frame in the stream.
+            detectTFMOBILE(video).then(function () {
+                // Call this function again to keep predicting when the browser is ready.
+                window.requestAnimationFrame(predictWebcamTF);
+            });
         }
-      }
+        const imageSize = 512;
+        //Match prob. threshold for object detection:
+        var classProbThreshold = 0.4; //40%
+        //Image detects object that matches the preset:
+
+        async function detectTFMOBILE(imgToPredict) {
+            //Get next video frame:
+            await tf.nextFrame();
+            //Create tensor from image:
+            const tfImg = tf.browser.fromPixels(imgToPredict);
+
+            //Create smaller image which fits the detection size
+            const smallImg = tf.image.resizeBilinear(tfImg, [vidHeight, vidWidth]);
+
+            const resized = tf.cast(smallImg, "int32");
+            var tf4d_ = tf.tensor4d(Array.from(resized.dataSync()), [
+                1,
+                vidHeight,
+                vidWidth,
+                3,
+            ]);
+            const tf4d = tf.cast(tf4d_, "int32");
+
+            //Perform the detection with your layer model:
+            let res2 = await model.executeAsync(tf4d);
+            //const count = res2[3].dataSync()[0];
+            //const boxes = res2[7].dataSync();
+            //const scores = res2[2].dataSync();
+            //const classes = res2[3].dataSync();
+
+            const scores = res2[3].dataSync();
+            //console.log(scores[0])
+            const count = res2[2].dataSync()[0];
+            const classes = res2[6].dataSync();
+            const boxes = res2[3].dataSync();
+            //console.log(res2);
+            //console.log(boxes);
+            //console.log("Count == ")
+            //console.log(count);
+            //console.log(scores);
+            //console.log(classes);
+            //console.log(classes);
+
+            //console.log(predictions[4].dataSync())
+
+            //Draw box around the detected object:
+            renderPredictionBoxes(boxes, classes, scores, count);
+            //Dispose of the tensors (so it won't consume memory)
+            tfImg.dispose();
+            smallImg.dispose();
+            resized.dispose();
+            tf4d.dispose();
+        }
+        //Function Renders boxes around the detections:
+        function renderPredictionBoxes(
+            predictionBoxes,
+            predictionClasses,
+            predictionScores,
+            count
+        ) {
+            //Remove all detections:
+            for (let i = 0; i < children.length; i++) {
+                liveView.removeChild(children[i]);
+            }
+            children.splice(0);
+            //Loop through predictions and draw them to the live view if they have a high confidence score.
+            for (let i = 0; i < count; i++) {
+                //If we are over 66% sure we are sure we classified it right, draw it!
+                const minY = (predictionBoxes[i * 4] * vidHeight + yStart).toFixed(0);
+                const minX = (predictionBoxes[i * 4 + 1] * vidWidth + xStart).toFixed(
+                    0
+                );
+                const maxY = (predictionBoxes[i * 4 + 2] * vidHeight + yStart).toFixed(
+                    0
+                );
+                const maxX = (predictionBoxes[i * 4 + 3] * vidWidth + xStart).toFixed(
+                    0
+                );
+                const score = predictionScores[i] * 100;
+                const width_ = (maxX - minX).toFixed(0);
+                const height_ = (maxY - minY).toFixed(0);
+                //If confidence is above 70%
+                if (score > 30 && score < 100) {
+                    console.log(score);
+                    console.log(predictionClasses[i]);
+                    const highlighter = document.createElement("div");
+                    highlighter.setAttribute("class", "highlighter");
+                    highlighter.style =
+                        "left: " +
+                        minX +
+                        "px; " +
+                        "top: " +
+                        minY +
+                        "px; " +
+                        "width: " +
+                        width_ +
+                        "px; " +
+                        "height: " +
+                        height_ +
+                        "px;";
+                    highlighter.innerHTML =
+                        "<p>" + Math.round(score) + "% " + "Your Object Name" + "</p>";
+                    liveView.appendChild(highlighter);
+                    children.push(highlighter);
+                }
+            }
+        }
+
+
     }
-
-
-  }
     function split() {
         axiosInstance
             .post("/split")
@@ -291,8 +291,8 @@ function startDetection() {
                         .post("/getResult")
                         .then((response) => {
                             console.log(response.data);
-                            
-                            if(response.data.status === 'RUNNING'){
+
+                            if (response.data.status === 'RUNNING') {
                                 result.innerHTML = JSON.stringify(response.data.status) + count
                             } else {
                                 result.innerHTML = "DONE Training"
@@ -303,7 +303,7 @@ function startDetection() {
                             console.log(error);
                         });
 
-            
+
                 }, 5000);
             })
             .catch((error) => {
@@ -340,7 +340,7 @@ function startDetection() {
     }
 
 
-  
+
 
 
 </script>
