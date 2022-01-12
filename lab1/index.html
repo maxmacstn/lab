@@ -51,6 +51,14 @@
     <form action='/upload' class="dropzone dz-clickable" id="dropper" enctype="multipart/form-data">
     </form>
 
+  <label>Tensorflow Version</label><br>
+  <label id="tfVersion"> </label> 
+
+  <label>Add two numbers</label><br>
+  <input type="number" id="a"> + 
+  <input type="number" id="b">= <label id="addResult"> </label> <br><br>
+  <button onclick="getAddition()">Calculate</button>
+
 </body>
 
 <script>
@@ -75,6 +83,7 @@
         .then((response) => {
             console.log(response.data);
             result.innerHTML = JSON.stringify(response.data)
+            document.getElementById('tfVersion').innerHTML = response.data["version"]
         })
         .catch((error) => {
             console.log(error);
@@ -88,7 +97,7 @@
             .then(function (stream) {
                 video.srcObject = stream;
             })
-            .catch(function (err0r) {
+            .catch(function (error) {
                 console.log("Something went wrong!");
             });
     }
@@ -339,7 +348,22 @@
 
     }
 
+  function getAddition() {
+        axiosInstance
+            .post("/add",{
+    		a: Number(document.getElementById("a").value),
+    		b: Number(document.getElementById("b").value)
+  			})
+            .then((response) => {
+                console.log(response.data);
+                addResult.innerHTML = response.data["result"]
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+// 	     addResult.innerHTML = Number(document.getElementById("a").value) + Number(document.getElementById("b").value)
 
+    }
 
 
 
