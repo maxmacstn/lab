@@ -52,7 +52,7 @@
     </form>
 
   <label>Tensorflow Version</label><br>
-  <label id="tfVersion"> </label> 
+  <label id="tfVersion"> </label> <br>
 
   <label>Add two numbers</label><br>
   <input type="number" id="a"> + 
@@ -348,12 +348,15 @@
 
     }
 
+
   function getAddition() {
+        json = JSON.stringify({
+    		"a": Number(document.getElementById("a").value),
+    		"b": Number(document.getElementById("b").value)
+  			});
+
         axiosInstance
-            .post("/add",{
-    		a: Number(document.getElementById("a").value),
-    		b: Number(document.getElementById("b").value)
-  			})
+            .post("/add",json, {headers: {'Content-Type': 'application/json'}})
             .then((response) => {
                 console.log(response.data);
                 addResult.innerHTML = response.data["result"]
@@ -361,7 +364,6 @@
             .catch((error) => {
                 console.log(error);
             });
-// 	     addResult.innerHTML = Number(document.getElementById("a").value) + Number(document.getElementById("b").value)
 
     }
 
